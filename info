@@ -1,0 +1,23 @@
+@relation '===============\nPACE Parameters\n===============\nInterfaceMapper:
+	-distanceCutoff=4.5
+	-interfaceRedundancy=0.8
+	-taintedCutoff=0.1
+	-minInterfaceSize=8, maxInterfaceSize=30
+External Calcs:
+	-msmsProbes=[1.4, 3.0, 5.0]
+RAC:
+RAC_ML:
+	-racAttributes=esolv,relSESA,hydro,propensity,protrusion,rate4site,density,curvature,ePot,disorder,betaFactor,roughness,scorecons
+	-racMLalgorithm=weka.classifiers.trees.FT, racMLoptions=
+	-racResampleRatios={INACTIVE=50, ACTIVE=50}
+PAC:
+	-minPatchSize=10, maxPatchSize=10, subsectionSize=20
+	-modResamplingRate=200
+	-overlapModifier=1.3, overlapModifierMethod=parabolic
+PAC_ML:
+	-pacAttributes=avgprotrusion,avgscorecons,kurzbetaFactor,roughness,kurzdensity,stdevesolv,avgesolv,kurzscorecons,avgdisorder,stdevrate4site,stdevroughness,relSESA,stdevpropensity,stdevePot,protrusion,avgrate4site,kurzrate4site,kurzePot,stdevdisorder,stdevrelSESA,stdevbetaFactor,avghydro,kurzroughness,kurzcurvature,stdevhydro,avgePot,avgcurvature,kurzpropensity,stdevprotrusion,racScore,density1,curvature,density3,avgpropensity,avgbetaFactor,stdevdensity,kurzprotrusion,kurzdisorder,avgrelSESA,stdevcurvature,stdevscorecons,kurzesolv,SESA,kurzrelSESA,avgroughness,kurzhydro,density2,avgdensity
+	-pacMLalgorithm=weka.classifiers.functions.MultilayerPerceptron
+	-pacResamplingParams=[CURRENTLY IN EXPERIMENTAL STAGES]
+	-PatchCompiler: patchThreshold=0.0, resThreshold=0.4
+
+'

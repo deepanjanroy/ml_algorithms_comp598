@@ -1,0 +1,3 @@
+*.tracker
+.DS_STORE
+*.pyc
