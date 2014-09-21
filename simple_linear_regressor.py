@@ -39,36 +39,13 @@ class LinearRegressor(object):
         shaped_input_list = array([ input + [1] for input in input_list])
         return (shaped_input_list).dot(self.weights).tolist()
 
-    def gradient(self):
-        return self._gradient(self.weights, self.X, self.Y, self.X.T.dot(self.X))
-
-
-    def _gradient(self, w, X, Y, XTX):
+    def get_gradient(self):
+        X = self.X
+        Y = self.Y
         XTX = X.T.dot(X)
-        return 2 * (XTX.dot(w) - X.T.dot(Y))
+        return lambda w: 2 * (XTX.dot(w) - X.T.dot(Y))
 
-    def gradient_descent_once(self, alpha, epsilon):
-        print "Running gradient descent... This may take a while"
-        XTX = self.X.T.dot(self.X)
-        w_prev = ones(self.X.shape[1],)
-        w_next = w_prev - alpha * self._gradient(w_prev, self.X, self.Y, XTX)
 
-        iterations = 0
-        while linalg.norm(w_next - w_prev) > epsilon:
-            w_prev = w_next
-            w_next = w_prev - alpha * self._gradient(w_prev, self.X, self.Y, XTX)
-
-            # print "Change: ", linalg.norm(w_next - w_prev)
-            iterations += 1
-
-            if iterations % 1e3 == 0:
-                sys.stdout.write("Iterations complete: %d   \r" % (iterations,) )
-                sys.stdout.flush()
-
-            ### DEBUG
-            if iterations < 5:
-                print w_next
-        return w_next
 
     def training_error(self):
         errors = (self.predict_multiple(self.X) - self.Y)
@@ -84,11 +61,7 @@ class LinearRegressor(object):
         errors = predictions - array(labels)
         return errors.sum() / shaped_input_list.shape[0]
 
-    def get_gradient(self):
-        X = self.X
-        Y = self.Y
-        XTX = X.T.dot(X)
-        return lambda w: 2 * (XTX.dot(w) - X.T.dot(Y))
+
 
 def calculate_test_error(regressor, test_data, test_labels):
     predictions = array(regressor.predict_multiple(test_data))
@@ -115,13 +88,16 @@ def show_normalization_sucks(samples, test_data):
         p = scikit_clf.predict(test_data)
         print "Scikit prediction: " + str(p)
 
+
 # Not sure how to properly test gradient descent
 def test_gradient_descent(samples, test_data, scikit_pred):
     reg = LinearRegressor(samples, labels)
-    reg.gradient_descent(epsilon=0.001)
-    print "Weights: ", reg.weights
-    print "prediction: ", reg.predict(test_data)
-    print "Scikit prediction: ", scikit_pred
+    gr = GradientDescentRunner(reg.get_gradient(), len(samples[0]) + 1)
+    weights = gr.run_once()
+    reg.weights = weights
+    p = reg.predict(test_data)
+    print "Prediction from gradient descent: ", p
+
 
 # Test error
 def test_regression_test_error(train_data, train_label, test_data, test_label):
@@ -162,10 +138,3 @@ if __name__ == "__main__":
     test_gradient_descent(samples, test_data, scikit_single_prediciton)
     test_regression_test_error(train_dataset, train_labels, test_dataset, test_labels)
 
-    ## Testing new gradient descent
-    test_reg = LinearRegressor(test_dataset, test_labels)
-    gr = GradientDescentRunner(test_reg.get_gradient(), len(samples[0]) + 1, epsilon=0.001)
-    res = gr.run_once()
-    test_reg.weights = res
-    new_p = test_reg.predict(test_data)
-    print "New result: ", new_p

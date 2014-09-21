@@ -2,17 +2,17 @@ import numpy as np
 import sys
 
 class GradientDescentRunner(object):
-    """What does this thing do? It runs gradient descent.
-    What is the input of gradient descent?
-    We are trying to find the minimum value of an objective function
-    Need w, initial objective function
-    Need an expression for the gradient with respect to w
-    Need hyperparameter \alpha, or find a way to choose it
-    need meta parameters like the maximum number of iterations
+    """Runs gradient descent.
 
+    Constructor params:
+        gradient: fun inp -> float
+            function to calculate gradient from input
+        inp_dim: int
+            dimension of input variable
 
-
-    How does it do it?
+    Methods:
+        run_once: numpy.array of shape (inp_dim,)
+            Runs gradient descent and returns a vector of dimension inp_dim
     """
 
     def __init__(self, gradient, inp_dim, alpha=1e-11, max_iter=9999999, epsilon=1e-5):
@@ -38,9 +38,5 @@ class GradientDescentRunner(object):
                 break
             if iter_count % 1e3 == 0:
                 self.report_iterations(iter_count)
-
-            ### DEBUG
-            if iter_count < 5:
-                print next
 
         return next
