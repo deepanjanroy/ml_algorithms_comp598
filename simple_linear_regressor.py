@@ -2,21 +2,28 @@ import dataparser
 import sys
 from numpy import *
 from gradientdescent import GradientDescentRunner
+from scales import Scale
 
 inv = linalg.inv
 
 
 class LinearRegressor(object):
-    weights = None
     normalizers = None
 
-    def __init__(self, samples, labels):
-        list_X = [r + [1] for r in samples]
+    def __init__(self, samples, labels, weights=None, scale=None):
+        # list_X = [r + [1] for r in samples]
+        list_X = [r for r in samples]
         self.X = array(list_X)
         self.Y = array(labels)
+        self.weights = weights
+
+        if scale is None:
+            self.scale = Scale.unit_scale(len(list_X[0]))
+        else:
+            # self.scale = scale.add_unit_elements(1)
+            self.scale = scale
 
     def train(self):
-        # from IPython import embed; embed()
         X = self.X
         Y = self.Y
 
@@ -30,9 +37,7 @@ class LinearRegressor(object):
 
     def predict(self, input):
         shaped_input = array([input + [1]])
-        if self.normalizers is not None:
-            shaped_input = shaped_input / self.normalizers
-
+        scaled_input = self.scale(shaped_input)
         return shaped_input.dot(self.weights)[0]
 
     def predict_multiple(self, input_list):
@@ -44,8 +49,6 @@ class LinearRegressor(object):
         Y = self.Y
         XTX = X.T.dot(X)
         return lambda w: 2 * (XTX.dot(w) - X.T.dot(Y))
-
-
 
     def training_error(self):
         errors = (self.predict_multiple(self.X) - self.Y)
@@ -60,7 +63,6 @@ class LinearRegressor(object):
         predictions = (shaped_input_list).dot(self.weights)
         errors = predictions - array(labels)
         return errors.sum() / shaped_input_list.shape[0]
-
 
 
 def calculate_test_error(regressor, test_data, test_labels):
@@ -93,7 +95,7 @@ def show_normalization_sucks(samples, test_data):
 def test_gradient_descent(samples, test_data, scikit_pred):
     reg = LinearRegressor(samples, labels)
     gr = GradientDescentRunner(reg.get_gradient(), len(samples[0]) + 1)
-    weights = gr.run_once()
+    _, weights = gr.run_once()
     reg.weights = weights
     p = reg.predict(test_data)
     print "Prediction from gradient descent: ", p
@@ -137,4 +139,4 @@ if __name__ == "__main__":
     ## Testing gradients
     test_gradient_descent(samples, test_data, scikit_single_prediciton)
     test_regression_test_error(train_dataset, train_labels, test_dataset, test_labels)
-
+`
